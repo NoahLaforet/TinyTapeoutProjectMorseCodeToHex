@@ -101,8 +101,8 @@ module tt_um_morse_to_hex (
   // 7-segment display encoder (combinational, from hexto7seg.v)
   // --------------------------------------------------------------------------
   // hex2ssd outputs active-HIGH segment signals (1 = segment on).
-  // The TinyTapeout 7-seg display is active-LOW (0 = segment on),
-  // so we invert with ~ssd_raw when driving uo_out[6:0].
+  // TinyTapeout's demo board expects active-HIGH on uo_out[6:0],
+  // so ssd_raw is assigned directly with no inversion.
   // ==========================================================================
   wire [6:0] ssd_raw;
 
@@ -155,9 +155,9 @@ module tt_um_morse_to_hex (
   // Output assignments
   // ==========================================================================
 
-  // uo_out[6:0]: 7-seg segments, active-low (inverted from hex2ssd output)
+  // uo_out[6:0]: 7-seg segments, active-high (1 = segment on, direct from hex2ssd)
   // uo_out[7]:   error LED, HIGH when last confirm was an invalid sequence
-  assign uo_out  = {error, ~ssd_raw};
+  assign uo_out  = {error, ssd_raw};
 
   // uio_out[4:0]: morse buffer LEDs — shows which symbols have been entered
   //               (1=dash, 0=dot); only positions 0..count-1 are meaningful
