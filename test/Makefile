@@ -22,4 +22,7 @@ results.xml:
 	vvp sim_build/sim.vvp
 	echo '<testsuites><testsuite name="tb" tests="1" failures="0"/></testsuites>' > results.xml
 
-.PHONY: results.xml
+clean:
+	rm -rf sim_build results.xml tb.fst
+
+.PHONY: results.xml clean
