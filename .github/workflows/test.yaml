@@ -10,13 +10,12 @@ jobs:
           submodules: recursive
 
       - name: Install iverilog
-        shell: bash
-        run: sudo apt-get update && sudo apt-get install -y iverilog
+        run: |
+          wget https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb
+          sudo apt-get update
+          sudo dpkg -i iverilog_13.0-1_amd64.deb
 
-      - name: Install cocotb
-        run: pip install -r test/requirements.txt
-
-      - name: Run tests
+      - name: Run RTL tests
         run: |
           cd test
           make -B

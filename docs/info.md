@@ -77,17 +77,17 @@ Press the dot and/or dash buttons to enter a morse code sequence for any hex dig
 
 ## Testbench
 
-The testbench (`test/test.py`) uses the cocotb framework to drive the DUT and verify outputs. It drives the DUT using explicit clock-cycle-level button press sequences and asserts the expected 7-segment output after each confirm.
+The testbench (`test/tb.v`) is a self-checking Verilog simulation with no external dependencies. It drives the DUT using explicit clock-cycle-level button press sequences and asserts the expected 7-segment output after each confirm.
 
 Each button press is modelled as a one-cycle high pulse, consistent with the rising-edge detection in the design:
-```python
-await FallingEdge(dut.clk)
-dut.ui_in.value = (1 << bit)  # assert button
-await RisingEdge(dut.clk)     # edge detected, state machine acts
-await FallingEdge(dut.clk)
-dut.ui_in.value = 0           # deassert
-await RisingEdge(dut.clk)     # prev register updates, ready for next press
+```verilog
+@(negedge clk); ui_in[N] = 1;  // assert button
+@(posedge clk);                  // edge detected, state machine acts
+@(negedge clk); ui_in[N] = 0;  // deassert
+@(posedge clk);                  // prev register updates, ready for next press
 ```
+
+For gate-level simulation, the testbench conditionally connects `VPWR` and `VGND` power pins to the DUT using `` `ifdef GL_TEST `` and extends the reset hold time to 20 cycles to allow synthesized flip-flops to fully initialize before stimulus begins.
 
 ### Test Coverage
 
@@ -96,7 +96,7 @@ The testbench contains **17 test cases** covering all possible valid outputs:
 - **16 valid sequences** — one for each hex digit (0–F), checking the exact active-high 7-segment pattern and that the error LED is low.
 - **1 invalid sequence** — four dashes (`----`), which has no morse mapping, checking that the error LED goes high.
 
-Each test checks both the 7-segment value and the error bit. After every test the buffer is cleared with the clear button before the next sequence begins. The testbench reports pass/fail counts and raises an assertion error if any test fails, enabling automatic CI detection of regressions. The check function also gracefully handles X/Z values that may appear during gate-level simulation before outputs have fully settled.
+Each test checks both the 7-segment value and the error bit. After every test the buffer is cleared with the clear button before the next sequence begins. The testbench exits with `$fatal` (non-zero exit code) if any assertion fails, enabling automatic CI detection of regressions.
 
 ### Why the Testbench is Sufficient
 
@@ -110,4 +110,13 @@ The design has a finite, fully enumerable input space: 16 valid morse sequences 
 
 ## GenAI Tools
 
-The project concept, morse encoding scheme, and `hexto7seg` 7-segment encoder (adapted from prior coursework in CSE 125) were created by myself. Claude (Anthropic) was used to assist with wiring the submodules together inside `tt_um_morse_to_hex`, implementing the button edge-detection and shift-register logic, and adapting the testbench template to exhaustively test every possible output of the design. Claude also assisted with the TinyTapeout submission flow, including converting the testbench to cocotb (`test.py`), fixing the `test/Makefile` to use the correct cocotb build system with the proper PDK paths for gate-level simulation, fixing the `test.yml` GitHub Actions workflow to install cocotb dependencies before running tests, and adding X/Z value handling in the testbench check function for gate-level simulation stability. I also had Claude update this document to have better formatting, improve my explanations, and add input examples.
+The project concept, morse encoding scheme, and `hexto7seg` 7-segment encoder (adapted from prior coursework in CSE 125) were created by myself. Claude (Anthropic) was used to assist with the following:
+
+- Wiring the submodules together inside `tt_um_morse_to_hex`, implementing the button edge-detection and shift-register logic
+- Adapting the testbench template to exhaustively test every possible output of the design
+- Converting the test infrastructure to the TinyTapeout CI flow, including fixing the `test/Makefile` to use the correct PDK paths for gate-level simulation
+- Replacing the cocotb-based test workflow with a plain iverilog/vvp flow driven entirely by `tb.v`, eliminating the cocotb dependency and the conflict between parallel simulation drivers
+- Adding `ifdef GL_TEST` conditional power pin connections (`VPWR`/`VGND`) to `tb.v` for gate-level simulation compatibility
+- Extending the reset hold time in `tb.v` to 20 cycles to allow synthesized flip-flops to fully initialize in GL sim
+- Updating the GitHub Actions `test.yml` workflow to install the TinyTapeout custom iverilog build and run the Verilog testbench directly
+- Updating this document to reflect all infrastructure changes with accurate formatting and descriptions
