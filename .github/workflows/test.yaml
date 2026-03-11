@@ -13,6 +13,9 @@ jobs:
         shell: bash
         run: sudo apt-get update && sudo apt-get install -y iverilog
 
+      - name: Install cocotb
+        run: pip install -r test/requirements.txt
+
       - name: Run tests
         run: |
           cd test
