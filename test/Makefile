@@ -21,8 +21,8 @@ results.xml:
 	iverilog -g2012 -s tb $(SIM_FLAGS) -I$(SRC_DIR) -o sim_build/sim.vvp $(VERILOG_SOURCES)
 	vvp sim_build/sim.vvp; true
 	echo '<testsuites><testsuite name="tb" tests="1" failures="0"/></testsuites>' > results.xml
-	
+
 clean:
 	rm -rf sim_build results.xml tb.fst
 
-.PHONY: results.xml clean
+.PHONY: clean
