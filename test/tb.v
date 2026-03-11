@@ -15,7 +15,7 @@
 //   @(negedge clk); ui_in[N] = 0;   <- deassert
 //   @(posedge clk);                   <- _prev register clears, ready for next press
 //
-// Expected uo_out[6:0] is active-HIGH (= hex2ssd output directly, 1 = segment on):
+// Expected uo_out[6:0] is active-HIGH (= hexto7seg output directly, 1 = segment on):
 //   TinyTapeout demo board expects active-high, no inversion needed
 //   0->0111111  1->0000110  2->1011011  3->1001111
 //   4->1100110  5->1101101  6->1111101  7->0000111
@@ -64,7 +64,7 @@ module tb;
     // =========================================================================
     // TEST 1: E  ->  .
     // morseToHex: count=1, buffer=00000
-    // hex2ssd(E) = 7'b1111001 active-high  ->  uo_out = 7'b1111001
+    // hexto7seg(E) = 7'b1111001 active-high  ->  uo_out = 7'b1111001
     // =========================================================================
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
     @(negedge clk); ui_in[2]=1; @(posedge clk); @(negedge clk); ui_in[2]=0; @(posedge clk); // confirm
@@ -78,7 +78,7 @@ module tb;
     // =========================================================================
     // TEST 2: A  ->  . -
     // morseToHex: count=2, buffer=10000
-    // hex2ssd(A) = 7'b1110111  ->  uo_out = 7'b1110111
+    // hexto7seg(A) = 7'b1110111  ->  uo_out = 7'b1110111
     // =========================================================================
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
@@ -93,7 +93,7 @@ module tb;
     // =========================================================================
     // TEST 3: D  ->  - . .
     // morseToHex: count=3, buffer=00100
-    // hex2ssd(D) = 7'b1011110  ->  uo_out = 7'b1011110
+    // hexto7seg(D) = 7'b1011110  ->  uo_out = 7'b1011110
     // =========================================================================
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
@@ -109,7 +109,7 @@ module tb;
     // =========================================================================
     // TEST 4: B  ->  - . . .
     // morseToHex: count=4, buffer=00010
-    // hex2ssd(B) = 7'b1111100  ->  uo_out = 7'b1111100
+    // hexto7seg(B) = 7'b1111100  ->  uo_out = 7'b1111100
     // =========================================================================
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
@@ -126,7 +126,7 @@ module tb;
     // =========================================================================
     // TEST 5: C  ->  - . - .
     // morseToHex: count=4, buffer=01010
-    // hex2ssd(C) = 7'b0111001  ->  uo_out = 7'b0111001
+    // hexto7seg(C) = 7'b0111001  ->  uo_out = 7'b0111001
     // =========================================================================
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
@@ -143,7 +143,7 @@ module tb;
     // =========================================================================
     // TEST 6: F  ->  . . - .
     // morseToHex: count=4, buffer=01000
-    // hex2ssd(F) = 7'b1110001  ->  uo_out = 7'b1110001
+    // hexto7seg(F) = 7'b1110001  ->  uo_out = 7'b1110001
     // =========================================================================
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
@@ -160,7 +160,7 @@ module tb;
     // =========================================================================
     // TEST 7: 0  ->  - - - - -
     // morseToHex: count=5, buffer=11111
-    // hex2ssd(0) = 7'b0111111  ->  uo_out = 7'b0111111
+    // hexto7seg(0) = 7'b0111111  ->  uo_out = 7'b0111111
     // =========================================================================
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
@@ -178,7 +178,7 @@ module tb;
     // =========================================================================
     // TEST 8: 1  ->  . - - - -
     // morseToHex: count=5, buffer=11110
-    // hex2ssd(1) = 7'b0000110  ->  uo_out = 7'b0000110
+    // hexto7seg(1) = 7'b0000110  ->  uo_out = 7'b0000110
     // =========================================================================
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
@@ -196,7 +196,7 @@ module tb;
     // =========================================================================
     // TEST 9: 2  ->  . . - - -
     // morseToHex: count=5, buffer=11100
-    // hex2ssd(2) = 7'b1011011  ->  uo_out = 7'b1011011
+    // hexto7seg(2) = 7'b1011011  ->  uo_out = 7'b1011011
     // =========================================================================
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
@@ -214,7 +214,7 @@ module tb;
     // =========================================================================
     // TEST 10: 3  ->  . . . - -
     // morseToHex: count=5, buffer=11000
-    // hex2ssd(3) = 7'b1001111  ->  uo_out = 7'b1001111
+    // hexto7seg(3) = 7'b1001111  ->  uo_out = 7'b1001111
     // =========================================================================
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
@@ -232,7 +232,7 @@ module tb;
     // =========================================================================
     // TEST 11: 4  ->  . . . . -
     // morseToHex: count=5, buffer=10000
-    // hex2ssd(4) = 7'b1100110  ->  uo_out = 7'b1100110
+    // hexto7seg(4) = 7'b1100110  ->  uo_out = 7'b1100110
     // =========================================================================
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
@@ -250,7 +250,7 @@ module tb;
     // =========================================================================
     // TEST 12: 5  ->  . . . . .
     // morseToHex: count=5, buffer=00000  (same bits as E but different count!)
-    // hex2ssd(5) = 7'b1101101  ->  uo_out = 7'b1101101
+    // hexto7seg(5) = 7'b1101101  ->  uo_out = 7'b1101101
     // =========================================================================
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
@@ -268,7 +268,7 @@ module tb;
     // =========================================================================
     // TEST 13: 6  ->  - . . . .
     // morseToHex: count=5, buffer=00001
-    // hex2ssd(6) = 7'b1111101  ->  uo_out = 7'b1111101
+    // hexto7seg(6) = 7'b1111101  ->  uo_out = 7'b1111101
     // =========================================================================
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
     @(negedge clk); ui_in[0]=1; @(posedge clk); @(negedge clk); ui_in[0]=0; @(posedge clk); // dot
@@ -286,7 +286,7 @@ module tb;
     // =========================================================================
     // TEST 14: 7  ->  - - . . .
     // morseToHex: count=5, buffer=00011
-    // hex2ssd(7) = 7'b0000111  ->  uo_out = 7'b0000111
+    // hexto7seg(7) = 7'b0000111  ->  uo_out = 7'b0000111
     // =========================================================================
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
@@ -304,7 +304,7 @@ module tb;
     // =========================================================================
     // TEST 15: 8  ->  - - - . .
     // morseToHex: count=5, buffer=00111
-    // hex2ssd(8) = 7'b1111111  ->  uo_out = 7'b1111111
+    // hexto7seg(8) = 7'b1111111  ->  uo_out = 7'b1111111
     // =========================================================================
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
@@ -322,7 +322,7 @@ module tb;
     // =========================================================================
     // TEST 16: 9  ->  - - - - .
     // morseToHex: count=5, buffer=01111
-    // hex2ssd(9) = 7'b1100111  ->  uo_out = 7'b1100111
+    // hexto7seg(9) = 7'b1100111  ->  uo_out = 7'b1100111
     // =========================================================================
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash
     @(negedge clk); ui_in[1]=1; @(posedge clk); @(negedge clk); ui_in[1]=0; @(posedge clk); // dash

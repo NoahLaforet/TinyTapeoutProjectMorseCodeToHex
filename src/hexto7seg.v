@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-module hex2ssd (
+module hexto7seg (
     input  wire [3:0] hex_i,
     output wire [6:0] ssd_o
 );

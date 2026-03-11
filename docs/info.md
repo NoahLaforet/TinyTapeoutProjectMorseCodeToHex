@@ -17,7 +17,7 @@ The design is split into three Verilog modules:
 
 - **`tt_um_morse_to_hex`** — top-level module. Handles button edge detection, a 5-bit morse input buffer, and orchestrates the decode pipeline.
 - **`morseToHex`** — combinational lookup table mapping a `(count, buffer)` pair to a 4-bit hex digit and a validity flag.
-- **`hex2ssd`** — combinational hex-to-7-segment encoder (active-high output, 1 = segment on), matching the TinyTapeout demo board convention.
+- **`hexto7seg`** — combinational hex-to-7-segment encoder (active-high output, 1 = segment on), matching the TinyTapeout demo board convention.
 
 ### Input Interface (`ui_in`)
 
@@ -108,4 +108,4 @@ The design has a finite, fully enumerable input space: 16 valid morse sequences 
 
 ## GenAI Tools
 
-The project concept, morse encoding scheme, and `hex2ssd` 7-segment encoder (adapted from prior coursework in CSE 125) were created by myself. Claude (Anthropic) was used to assist with wiring the submodules together inside `tt_um_morse_to_hex`, implementing the button edge-detection and shift-register logic, and adapting the testbench template to exhaustively test every possible output of the design. I also had claude update this document to have better formatting, improve my explanations, and add input examples from a prompted input where I told it what to say.
+The project concept, morse encoding scheme, and `hexto7seg` 7-segment encoder (adapted from prior coursework in CSE 125) were created by myself. Claude (Anthropic) was used to assist with wiring the submodules together inside `tt_um_morse_to_hex`, implementing the button edge-detection and shift-register logic, and adapting the testbench template to exhaustively test every possible output of the design. I also had claude update this document to have better formatting, improve my explanations, and add input examples from a prompted input where I told it what to say.

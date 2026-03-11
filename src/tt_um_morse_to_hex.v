@@ -100,13 +100,13 @@ module tt_um_morse_to_hex (
   // ==========================================================================
   // 7-segment display encoder (combinational, from hexto7seg.v)
   // --------------------------------------------------------------------------
-  // hex2ssd outputs active-HIGH segment signals (1 = segment on).
+  // hexto7seg outputs active-HIGH segment signals (1 = segment on).
   // TinyTapeout's demo board expects active-HIGH on uo_out[6:0],
   // so ssd_raw is assigned directly with no inversion.
   // ==========================================================================
   wire [6:0] ssd_raw;
 
-  hex2ssd ssd (
+  hexto7seg ssd (
     .hex_i(hex_latched), // the latched hex digit to display
     .ssd_o(ssd_raw)      // active-HIGH segment pattern (GFEDCBA)
   );
@@ -155,7 +155,7 @@ module tt_um_morse_to_hex (
   // Output assignments
   // ==========================================================================
 
-  // uo_out[6:0]: 7-seg segments, active-high (1 = segment on, direct from hex2ssd)
+  // uo_out[6:0]: 7-seg segments, active-high (1 = segment on, direct from hexto7seg)
   // uo_out[7]:   error LED, HIGH when last confirm was an invalid sequence
   assign uo_out  = {error, ssd_raw};
 
