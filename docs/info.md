@@ -68,7 +68,7 @@ Press the dot and/or dash buttons to enter a morse code sequence for any hex dig
 
 ## Testbench
 
-The testbench uses **cocotb** (the canonical TinyTapeout test framework) with `test.py` as the sole test driver. `tb.v` is a passive waveform-capture wrapper only — all stimulus and assertions are in Python.
+The testbench uses **cocotb** (the canonical TinyTapeout test framework) with `test.py` as the sole test driver. `tb.v` instantiates `tt_um_morse_to_hex` and wires all ports, providing cocotb with named signal handles and capturing waveforms to `tb.fst`. All stimulus and assertions are in `test.py`.
 
 Each button press is modelled as a one-cycle high pulse followed by one cycle low, consistent with the rising-edge detection in the design. Because `*_rise = input & ~*_prev`, the rise is detected on the same cycle the input goes high, and cleared the following cycle when `*_prev` catches up:
 ```python
@@ -78,7 +78,9 @@ dut.ui_in.value = 0           # deassert; prev updates, ready for next press
 await RisingEdge(dut.clk)
 ```
 
-For gate-level simulation, the Makefile passes `-DGL_TEST -DFUNCTIONAL -DUSE_POWER_PINS -DSIM -DUNIT_DELAY=#1` and points to the sky130 PDK primitives. Reset is held for 20 cycles to allow synthesized flip-flops to fully initialize before stimulus begins.
+Reset is held for 40 cycles to allow synthesized flip-flops to fully initialize, followed by 10 idle cycles before stimulus begins. After each confirm pulse, 5 settling cycles are waited before sampling `uo_out`.
+
+For gate-level simulation, the Makefile passes `-DGL_TEST -DFUNCTIONAL -DUSE_POWER_PINS -DSIM -DUNIT_DELAY=#1` and points to the sky130 PDK primitives. `tb.v` includes `ifdef GL_TEST` guards to connect `VPWR` and `VGND` power pins required by the synthesized netlist.
 
 ### Test Coverage
 
@@ -87,7 +89,7 @@ The testbench contains **17 test cases** covering all possible valid outputs:
 - **16 valid sequences** — one for each hex digit (0–F), checking the exact active-high 7-segment pattern and that the error LED is low.
 - **1 invalid sequence** — four dashes (`----`), which has no morse mapping, checking that the error LED goes high.
 
-Each test checks both the 7-segment value (`uo_out[6:0]`) and the error bit (`uo_out[7]`). The buffer is cleared before each sequence. Pass/fail is reported via cocotb's standard JUnit XML output (`results.xml`), which the CI workflow checks with `! grep failure results.xml`.
+Each test checks both the 7-segment value (`uo_out[6:0]`) and the error bit (`uo_out[7]`). The buffer is cleared before each sequence via a one-cycle pulse on `ui_in[3]`. Pass/fail is reported via cocotb's standard JUnit XML output (`results.xml`), which the CI workflow checks with `! grep failure results.xml`.
 
 ### Why the Testbench is Sufficient
 
@@ -108,6 +110,6 @@ The project concept, morse encoding scheme, and `hexto7seg` 7-segment encoder (a
 - Converting the test infrastructure to the TinyTapeout CI flow, including fixing the `test/Makefile` to use the correct PDK paths for gate-level simulation
 - Debugging the cocotb/tb.v conflict where both were driving the DUT simultaneously, causing race conditions and `$fatal` kills
 - Iterating through multiple testbench approaches (pure iverilog/vvp, then reverting to canonical cocotb) to resolve GL test exit code failures
-- Rewriting the testbench as a proper cocotb flow: passive `tb.v` for waveform capture only, all stimulus and assertions in `test.py`
+- Restoring the canonical TinyTapeout `tb.v` structure (DUT instantiation with `ifdef GL_TEST` power pin guards) and confirming it resolves the `tb contains no child object named clk` cocotb error
 - Restoring the original TinyTapeout `test.yml` workflow, which correctly uses `! grep failure results.xml` to determine pass/fail rather than the make exit code
 - Updating this document to reflect all infrastructure changes with accurate formatting and descriptions

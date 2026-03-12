@@ -2,23 +2,29 @@
 # SPDX-License-Identifier: Apache-2.0
 
 SIM ?= icarus
+FST ?= -fst
 TOPLEVEL_LANG ?= verilog
-
-VERILOG_SOURCES += $(PWD)/../src/tt_um_morse_to_hex.v
-VERILOG_SOURCES += $(PWD)/../src/morseToHex.v
-VERILOG_SOURCES += $(PWD)/../src/hexto7seg.v
+SRC_DIR = $(PWD)/../src
+PROJECT_SOURCES = tt_um_morse_to_hex.v morseToHex.v hexto7seg.v
 
 ifneq ($(GATES),yes)
-  TOPLEVEL = tt_um_morse_to_hex
+  SIM_BUILD = sim_build/rtl
+  VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
 else
-  COMPILE_ARGS += -DGL_TEST -DFUNCTIONAL -DUSE_POWER_PINS -DSIM -DUNIT_DELAY=#1
-  VERILOG_SOURCES := \
-    $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v \
-    $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v \
-    $(PWD)/gate_level_netlist.v
-  TOPLEVEL = tt_um_morse_to_hex
+  SIM_BUILD = sim_build/gl
+  COMPILE_ARGS += -DGL_TEST
+  COMPILE_ARGS += -DFUNCTIONAL
+  COMPILE_ARGS += -DUSE_POWER_PINS
+  COMPILE_ARGS += -DSIM
+  COMPILE_ARGS += -DUNIT_DELAY=\#1
+  VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
+  VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
+  VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 endif
 
-MODULE = test
+COMPILE_ARGS += -I$(SRC_DIR)
+VERILOG_SOURCES += $(PWD)/tb.v
+TOPLEVEL = tb
+COCOTB_TEST_MODULES = test
 
 include $(shell cocotb-config --makefiles)/Makefile.sim
